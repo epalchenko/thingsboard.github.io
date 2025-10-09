@@ -15,7 +15,7 @@ Widgets are used to:
 
 ### Widget types
 
-ThingsBoard provides five main widget types:
+ThingsBoard provides five main widget types: 
 
 - **Time series widgets**. Show data over a selected time window. The window can be:
   - **Real time** — a rolling interval such as the last 5 minutes or last 24 hours.
