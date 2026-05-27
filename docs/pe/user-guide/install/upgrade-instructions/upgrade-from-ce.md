@@ -23,7 +23,7 @@ description: Upgrading from Community Edition
     <a href="#docker-compose" id="markdown-toc-docker-compose-ce">Docker Compose</a>
   </li>
   <li>
-    <a href="#minikube" id="markdown-toc-minikube-ce">Minikube</a>
+    <a href="#kubernetes" id="markdown-toc-kubernetes-ce">Kubernetes</a>
   </li>
 </ul>
 
@@ -259,89 +259,6 @@ docker pull thingsboard/tb-pe-web-report:{{ site.release.pe_ver }}
 ```
 {: .copy-code}
 
-## Minikube {#minikube}
+## Kubernetes {#kubernetes}
 
-{% capture difference %}
-**NOTE:**
-<br>
-These upgrade steps are applicable for the latest ThingsBoard Community Edition version. In order to upgrade to Professional Edition you need to [**upgrade to the latest Community Edition version first**](/docs/user-guide/install/upgrade-instructions/).
-{% endcapture %}
-{% include templates/warn-banner.md content=difference %}
-
-#### Clone ThingsBoard PE Kubernetes scripts
-
-```bash
-git clone -b release-{{ site.release.pe_full_ver }} https://github.com/thingsboard/thingsboard-pe-k8s.git --depth 1
-cd thingsboard-pe-k8s/minikube
-```
-{: .copy-code}
-
-#### Configure your license key
-
-Open `tb-node.yml` and set the license secret:
-
-```bash
-nano tb-node.yml
-```
-{: .copy-code}
-
-```yaml
-- name: TB_LICENSE_SECRET
-  value: "PUT_YOUR_LICENSE_SECRET_HERE"
-```
-
-See [How-to get pay-as-you-go subscription](https://www.youtube.com/watch?v=dK-QDFGxWek){:target="_blank"} or [How-to get perpetual license](https://www.youtube.com/watch?v=GPe0lHolWek){:target="_blank"} for more details.
-
-#### Stop ThingsBoard CE resources
-
-```bash
-./k8s-delete-resources.sh
-```
-{: .copy-code}
-
-#### Run the database upgrade
-
-```bash
-./k8s-upgrade-tb.sh --fromVersion=CE
-```
-{: .copy-code}
-
-This command creates a temporary `tb-db-setup` pod that migrates the existing CE database schema to PE and loads PE system data.
-
-{% capture minikube_upgrade_note %}
-**NOTE:**
-<br>
-The upgrade pod requires all third-party services (Zookeeper, Kafka, Valkey, PostgreSQL, and Cassandra if using the `hybrid` database mode) to be running before executing the upgrade command.
-If the pod times out, make sure all pods in the `thingsboard` namespace are in `Running` state first:
-
-```bash
-kubectl get pods -n thingsboard
-```
-Then re-run `./k8s-upgrade-tb.sh --fromVersion=CE`.
-{% endcapture %}
-{% include templates/info-banner.md content=minikube_upgrade_note %}
-
-#### Deploy ThingsBoard PE resources
-
-```bash
-./k8s-deploy-resources.sh
-```
-{: .copy-code}
-
-#### Verify the upgrade
-
-Wait until all pods are running:
-
-```bash
-kubectl get pods -n thingsboard
-```
-{: .copy-code}
-
-Get the Minikube IP and open it in your browser:
-
-```bash
-minikube ip
-```
-{: .copy-code}
-
-Open `http://{your-minikube-ip}` and log in using your existing credentials.
+{% include templates/install/k8s-upgrade-from-ce.md %}
